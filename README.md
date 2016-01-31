@@ -1,1 +1,1 @@
-# Reduce Imagem Keeping Quality
+# Reduce Imagem Keeping Quality C#
