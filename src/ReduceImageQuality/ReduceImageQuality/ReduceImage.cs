@@ -10,28 +10,31 @@ namespace ReduceImageQuality.POC
         public void Reduce(Stream file, string pathSource, long quality = 50)
         {
             // Create a Bitmap object based on a BMP file.
-            Bitmap myBitmap = new Bitmap(file);
-
-            SavePath(pathSource, quality, myBitmap);
+            using (Bitmap myBitmap = new Bitmap(file))
+            {
+                SavePathSource(pathSource, quality, myBitmap);
+            }
         }
 
         public void Reduce(string fileName, string pathSource, long quality = 50)
         {
             // Create a Bitmap object based on a BMP file.
-            Bitmap myBitmap = new Bitmap(fileName);
-
-            SavePath(pathSource, quality, myBitmap);
+            using (Bitmap myBitmap = new Bitmap(fileName))
+            {
+                SavePathSource(pathSource, quality, myBitmap);
+            }
         }
 
-        public Bitmap Reduce(Stream stream, long qulity = 50)
+        public Bitmap Reduce(Stream stream, long quality = 50)
         {
             // Create a Bitmap object based on a BMP file.
-            Bitmap myBitmap = new Bitmap(stream);
-
-            return Treatment(stream, qulity, myBitmap);
+            using (Bitmap myBitmap = new Bitmap(stream))
+            {
+                return SaveInMemory(stream, quality, myBitmap);
+            }
         }
 
-        private Bitmap Treatment(Stream stream, long quality, Bitmap myBitmap)
+        Bitmap SaveInMemory(Stream stream, long quality, Bitmap myBitmap)
         {
             ImageCodecInfo myImageCodecInfo;
             Encoder myEncoder;
@@ -46,17 +49,18 @@ namespace ReduceImageQuality.POC
             myEncoder = Encoder.Quality;
 
             // EncoderParameter object in the array.
-            myEncoderParameters = new EncoderParameters(1);
-
-            // Save the bitmap as a JPEG file with quality level 25.            
-            myEncoderParameter = new EncoderParameter(myEncoder, quality);
-            myEncoderParameters.Param[0] = myEncoderParameter;
-            myBitmap.Save(stream, myImageCodecInfo, myEncoderParameters);
+            using (myEncoderParameters = new EncoderParameters(1))
+            {
+                // Save the bitmap as a JPEG file with quality level.            
+                myEncoderParameter = new EncoderParameter(myEncoder, quality);
+                myEncoderParameters.Param[0] = myEncoderParameter;
+                myBitmap.Save(stream, myImageCodecInfo, myEncoderParameters);
+            }
 
             return myBitmap;
         }
 
-        private void SavePath(string pathSource, long quality, Bitmap myBitmap)
+        void SavePathSource(string pathSource, long quality, Bitmap myBitmap)
         {
             ImageCodecInfo myImageCodecInfo;
             Encoder myEncoder;
@@ -71,16 +75,17 @@ namespace ReduceImageQuality.POC
             myEncoder = Encoder.Quality;
 
             // EncoderParameter object in the array.
-            myEncoderParameters = new EncoderParameters(1);
-
-            // Save the bitmap as a JPEG file with quality level 25.            
-            myEncoderParameter = new EncoderParameter(myEncoder, quality);
-            myEncoderParameters.Param[0] = myEncoderParameter;
-            myBitmap.Save(pathSource, myImageCodecInfo, myEncoderParameters);
+            using (myEncoderParameters = new EncoderParameters(1))
+            {
+                // Save the bitmap as a JPEG file with quality level.            
+                myEncoderParameter = new EncoderParameter(myEncoder, quality);
+                myEncoderParameters.Param[0] = myEncoderParameter;
+                myBitmap.Save(pathSource, myImageCodecInfo, myEncoderParameters);
+            }
         }
 
-        private static ImageCodecInfo GetEncoderInfo(String mimeType)
-        {   
+        ImageCodecInfo GetEncoderInfo(String mimeType)
+        {
             ImageCodecInfo[] encoders = ImageCodecInfo.GetImageEncoders();
 
             for (int j = 0; j < encoders.Length; ++j)
